@@ -2,7 +2,6 @@
 
 Support finding classrooms of University of Tsukuba.
 
-
 This application is powered by [`sv`](https://github.com/sveltejs/cli)
 
 ## Developing
