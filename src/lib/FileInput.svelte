@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { ChangeEventHandler, DragEventHandler } from "svelte/elements";
   import Progress from "./Progress.svelte";
+  import { parseXlsxFile } from "./parseFile";
+  import { deleteIdb } from "./idb";
 
   const progress = {
     value: 0,
@@ -32,18 +34,24 @@
     isSetFiles = filesDOM.files && filesDOM.files.length > 0 ? true : false;
   };
 
-  const uploadFiles = async () => {
+  const registerFiles = async () => {
     if (!filesDOM.files) {
       return;
     }
 
-    const files = [...filesDOM.files];
+    const files = filesDOM.files;
 
-    if (files && files.length > 0) {
-      progress.text = "アップロートURLを取得しています";
-      progress.value = 0;
+    if (files && files.length === 1) {
+      progress.text = "ファイルを変換しています……";
+      progress.value = 0.1;
 
-      progress.text = "画像のアップロードが完了しました";
+      const file = await files[0].arrayBuffer();
+      progress.value = 0.5;
+
+      progress.text = "Excelファイルからインポートしています……";
+      parseXlsxFile(file);
+
+      progress.text = "登録が完了しました！";
       progress.value = 1;
     } else {
       progress.text = "ファイルがありません";
@@ -83,7 +91,7 @@
   bind:this={filesDOM}
 />
 
-<button type="submit" disabled={!isSetFiles} onclick={uploadFiles}
+<button type="button" disabled={!isSetFiles} onclick={registerFiles}
   >取り込む</button
 >
 
