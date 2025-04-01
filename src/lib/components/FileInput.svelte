@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { ChangeEventHandler, DragEventHandler } from "svelte/elements";
   import Progress from "./Progress.svelte";
-  import { parseXlsxFile } from "./parseFile";
-  import { deleteIdb } from "./idb";
+  import { parseXlsxFile } from "../parseFile";
+  import { deleteIdb } from "../idb";
 
   let progress = $state({
     value: 0,

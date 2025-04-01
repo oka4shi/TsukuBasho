@@ -1,5 +1,5 @@
 <script lang="ts">
-  import FileInput from "$lib/FileInput.svelte";
+  import FileInput from "$lib/components/FileInput.svelte";
 </script>
 
 <h1>TsukuBasho（ベータ版）</h1>
