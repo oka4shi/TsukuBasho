@@ -2,7 +2,6 @@
   import type { ChangeEventHandler, DragEventHandler } from "svelte/elements";
   import Progress from "./Progress.svelte";
   import { parseXlsxFile } from "../parseFile";
-  import { deleteIdb } from "../idb";
 
   let progress = $state({
     value: 0,
@@ -93,13 +92,6 @@
 
 <button type="button" disabled={!isSetFiles} onclick={registerFiles}
   >取り込む</button
->
-
-<button
-  type="button"
-  onclick={() => {
-    deleteIdb("TsukuBasho");
-  }}>リセットする</button
 >
 
 <Progress {...progress} />
