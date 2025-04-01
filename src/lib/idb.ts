@@ -1,5 +1,5 @@
 import { openDB, deleteDB } from "idb";
-import type { DBSchema } from "idb";
+import type { DBSchema, IDBPDatabase } from "idb";
 
 export type Course = {
   number: string;
@@ -12,7 +12,7 @@ export type Course = {
   instructor: string;
 };
 
-interface TsukuBashoDB extends DBSchema {
+export interface TsukuBashoDB extends DBSchema {
   list_of_courses: {
     key: string; // Course Number
     value: Course;
@@ -81,12 +81,45 @@ export const registerCourses = async (dbName: string, data: string[][]) => {
 };
 
 export const getCourseFromNumber = async (
-  dbName: string,
+  db: IDBPDatabase<TsukuBashoDB>,
   courseNumber: string
 ): Promise<Course | undefined> => {
-  const db = await openDB<TsukuBashoDB>(dbName);
-
   const course = await db.get("list_of_courses", courseNumber);
   console.log(course);
   return course;
+};
+
+export const getCoursesMap = async (
+  db: IDBPDatabase<TsukuBashoDB>
+): Promise<Map<string, string>> => {
+  const rawCourses = await db.getAll("list_of_courses");
+  const courses = new Map<string, string>();
+  rawCourses.forEach((row) => {
+    courses.set(row.number, row.name);
+  });
+  return courses;
+};
+
+export const searchCoursesFromName = async (
+  db: IDBPDatabase<TsukuBashoDB>,
+  courses: Map<string, string>,
+  courseName: string
+): Promise<(Course | undefined)[]> => {
+  // 部分一致検索
+  let keys: string[] = [];
+  for (const course of courses) {
+    if (course[1].includes(courseName)) {
+      keys.push(course[0]);
+    }
+  }
+
+  const tx = db.transaction("list_of_courses", "readonly");
+  const result = await Promise.all(
+    keys.map((key) => {
+      return tx.store.get(key);
+    })
+  );
+  await tx.done;
+
+  return result;
 };
