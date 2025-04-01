@@ -4,11 +4,11 @@
   import { parseXlsxFile } from "./parseFile";
   import { deleteIdb } from "./idb";
 
-  const progress = {
+  let progress = $state({
     value: 0,
     text: "",
     isError: false
-  };
+  });
 
   let isSetFiles = $state(false);
 
