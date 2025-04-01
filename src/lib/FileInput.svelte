@@ -95,6 +95,13 @@
   >取り込む</button
 >
 
+<button
+  type="button"
+  onclick={() => {
+    deleteIdb("TsukuBasho");
+  }}>リセットする</button
+>
+
 <Progress {...progress} />
 
 <style>
