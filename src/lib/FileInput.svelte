@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ChangeEventHandler, DragEventHandler } from "svelte/elements";
   import Progress from "./Progress.svelte";
 
   const progress = {
@@ -7,10 +8,13 @@
     isError: false
   };
 
-  let filesDOM: HTMLInputElement;
-  let isDragged = false;
+  let isSetFiles = $state(false);
 
-  const getFiles = (event: DragEvent) => {
+  let filesDOM: HTMLInputElement;
+  let isDragged = $state(false);
+
+  const getFiles: DragEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
     isDragged = false;
     if (
       filesDOM.files &&
@@ -18,15 +22,14 @@
       event.dataTransfer.files.length > 0
     ) {
       filesDOM.files = event.dataTransfer.files;
+      isSetFiles = true;
+    } else {
+      isSetFiles = false;
     }
   };
 
-  const toString = (n: number | string | undefined) => {
-    if (n === undefined) {
-      return n;
-    } else {
-      return String(n);
-    }
+  const changeFileState: ChangeEventHandler<HTMLInputElement> = () => {
+    isSetFiles = filesDOM.files && filesDOM.files.length > 0 ? true : false;
   };
 
   const uploadFiles = async () => {
@@ -54,14 +57,15 @@
   type="button"
   class="drop_area"
   class:dragged_background={isDragged}
-  on:dragover|preventDefault={() => {
+  ondragover={(e) => {
+    e.preventDefault();
     isDragged = true;
   }}
-  on:dragleave={() => {
+  ondragleave={() => {
     isDragged = false;
   }}
-  on:drop|preventDefault={getFiles}
-  on:click={() => {
+  ondrop={getFiles}
+  onclick={() => {
     filesDOM.click();
   }}
 >
@@ -71,9 +75,15 @@
   </div>
 </button>
 
-<input type="file" id="userfile" accept=".xlsx" bind:this={filesDOM} />
+<input
+  type="file"
+  id="userfile"
+  accept=".xlsx"
+  onchange={changeFileState}
+  bind:this={filesDOM}
+/>
 
-<button type="submit" disabled={!filesDOM?.value} on:click={uploadFiles}
+<button type="submit" disabled={!isSetFiles} onclick={uploadFiles}
   >取り込む</button
 >
 
