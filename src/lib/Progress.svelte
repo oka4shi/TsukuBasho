@@ -15,9 +15,6 @@
   });
 
   $effect(() => {
-    console.log(value);
-    console.log("target", tween.target);
-    console.log("current", tween.current);
     tween.target = value;
   });
 </script>
