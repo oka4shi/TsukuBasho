@@ -175,7 +175,8 @@
 
     input[type="search"] {
       height: 100%;
-      width: 25rem;
+      width: calc(100% - 2rem);
+      max-width: 25rem;
       padding: 0.375em 0.5em;
       font-size: 1.25rem;
       line-height: 1.2;
@@ -198,7 +199,9 @@
   }
 
   .courses {
-    margin-inline: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .card {
     border: 1px solid #ddd;
@@ -206,6 +209,9 @@
     margin-block: 1em;
     border-radius: 0.5em;
     box-shadow: 0.25rem 0.25rem 0.5rem lightgray;
+
+    width: 100%;
+    max-width: 50rem;
 
     &:hover {
       background-color: #f5f5f5;
