@@ -65,18 +65,21 @@
     }
 
     // 科目番号で検索
-    const courseNumbers = completeNumber(coursesMap, query);
+    const courseNumbersResult = completeNumber(coursesMap, query);
     // 科目名で検索
-    const courseNumbers1 = searchNumberFromName(coursesMap, query);
+    const courseNamesResult = searchNumberFromName(coursesMap, query);
+
+    const combinedResult = Array.from(
+      new Set([...courseNumbersResult, ...courseNamesResult])
+    );
 
     // 内容をいったんリセット
     result = [];
     number = {
       shown: 0,
-      searched: courseNumbers.length + courseNumbers1.length
+      searched: combinedResult.length
     };
-    courseNumbers.forEach(addResultToDOM);
-    courseNumbers1.forEach(addResultToDOM);
+    combinedResult.forEach(addResultToDOM);
   };
 </script>
 
