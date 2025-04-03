@@ -1,16 +1,6 @@
 import { openDB, deleteDB } from "idb";
 import type { DBSchema, IDBPDatabase } from "idb";
-
-export type Course = {
-  number: string;
-  name: string;
-  credits: string;
-  standard_registration_year: string;
-  term: string;
-  meeting_days_period_etc: string;
-  classroom: string;
-  instructor: string;
-};
+import type { Course, CoursesMap, NameAndClassroom } from "./types";
 
 export interface TsukuBashoDB extends DBSchema {
   list_of_courses: {

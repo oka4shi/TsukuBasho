@@ -1,11 +1,9 @@
 <script lang="ts">
-  import {
-    getCourseFromNumber,
-    searchCoursesFromName,
-    getCoursesMap
-  } from "$lib/idb";
+  import { getCourseFromNumber, getCoursesMap } from "$lib/idb";
+  import { searchNumberFromName } from "$lib/search";
   import { openDB, type IDBPDatabase } from "idb";
-  import type { Course, TsukuBashoDB } from "$lib/idb";
+  import type { TsukuBashoDB } from "$lib/idb";
+  import type { CoursesMap } from "$lib/types";
   import { onMount } from "svelte";
 
   let query = "";
@@ -15,7 +13,7 @@
   const dbName = "TsukuBasho";
 
   let db: IDBPDatabase<TsukuBashoDB>;
-  let coursesMap: Map<string, string>;
+  let coursesMap: CoursesMap;
 
   onMount(async () => {
     db = await openDB<TsukuBashoDB>(dbName);
