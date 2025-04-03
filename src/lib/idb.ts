@@ -80,7 +80,6 @@ export const registerCourses = async (
       // 番号が0から始まる科目はスキップ
       return;
     }
-    console.log(row[dataColumn.number]);
 
     const record = getKeys(dataColumn).map((key) => {
       return [key, String(row[dataColumn[key]])];
