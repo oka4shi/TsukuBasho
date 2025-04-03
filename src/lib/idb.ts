@@ -85,41 +85,16 @@ export const getCourseFromNumber = async (
   courseNumber: string
 ): Promise<Course | undefined> => {
   const course = await db.get("list_of_courses", courseNumber);
-  console.log(course);
   return course;
 };
 
 export const getCoursesMap = async (
   db: IDBPDatabase<TsukuBashoDB>
-): Promise<Map<string, string>> => {
+): Promise<CoursesMap> => {
   const rawCourses = await db.getAll("list_of_courses");
-  const courses = new Map<string, string>();
+  const courses = new Map<string, NameAndClassroom>();
   rawCourses.forEach((row) => {
-    courses.set(row.number, row.name);
+    courses.set(row.number, { name: row.name, classroom: row.classroom });
   });
   return courses;
-};
-
-export const searchCoursesFromName = async (
-  db: IDBPDatabase<TsukuBashoDB>,
-  courses: Map<string, string>,
-  courseName: string
-): Promise<(Course | undefined)[]> => {
-  // 部分一致検索
-  let keys: string[] = [];
-  for (const course of courses) {
-    if (course[1].includes(courseName)) {
-      keys.push(course[0]);
-    }
-  }
-
-  const tx = db.transaction("list_of_courses", "readonly");
-  const result = await Promise.all(
-    keys.map((key) => {
-      return tx.store.get(key);
-    })
-  );
-  await tx.done;
-
-  return result;
 };

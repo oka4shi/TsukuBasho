@@ -6,14 +6,18 @@
   import type { CoursesMap } from "$lib/types";
   import { onMount } from "svelte";
 
-  let query = "";
-
-  let result: (Course | undefined)[] = [];
+  let query = $state("");
+  let result: { number: string; name: string; classroom: string }[] = $state(
+    []
+  );
+  let number = $state({ shown: 0, searched: 0 });
 
   const dbName = "TsukuBasho";
 
   let db: IDBPDatabase<TsukuBashoDB>;
   let coursesMap: CoursesMap;
+
+  let searchProcesses: number[] = [];
 
   onMount(async () => {
     db = await openDB<TsukuBashoDB>(dbName);
@@ -22,16 +26,44 @@
 
   const search = async () => {
     result = [];
+    number = { shown: 0, searched: 0 };
+    searchProcesses.forEach((p) => {
+      clearTimeout(p);
+    });
+    searchProcesses = [];
+
+    if (query === "") {
+      return;
+    }
+
     const course = await getCourseFromNumber(db, query);
-
-    const courses = await searchCoursesFromName(db, coursesMap, query);
-
     if (course) {
-      result.push(course);
+      result.push({
+        number: course.number,
+        name: course.name,
+        classroom: course.classroom
+      });
+      number = { shown: 1, searched: 1 };
     }
-    if (courses) {
-      result = result.concat(courses);
-    }
+
+    const courseNumbers = searchNumberFromName(coursesMap, query);
+    number.searched = courseNumbers.length;
+
+    courseNumbers.forEach((courseNumber) => {
+      const c = coursesMap.get(courseNumber);
+      if (c === undefined) {
+        throw new Error("見つかりません");
+      }
+      const timeoutId = setTimeout(() => {
+        result.push({
+          number: courseNumber,
+          name: c.name,
+          classroom: c.classroom
+        });
+        number.shown += 1;
+      });
+      searchProcesses.push(timeoutId);
+    });
   };
 </script>
 
@@ -45,7 +77,7 @@
     <button type="button" onclick={search}>検索</button>
   </form>
   <p>
-    {#if result[0]}
+    {#if result && result[0]}
       <span>{result[0].number}</span>
       <span>{result[0].name}</span>
       <span>の教室は</span>
@@ -53,9 +85,12 @@
       <span>です！</span>
     {/if}
   </p>
+  <p>
+    他にも{number.searched}件の授業が見つかりました（{number.shown}件を表示中）
+  </p>
   <table>
     <tbody>
-      {#each result as course}
+      {#each result as course (course.number)}
         {#if course}
           <tr>
             <td>{course.number}</td>

@@ -1,5 +1,5 @@
 import * as xlsx from "xlsx";
-import { createIdb, registerCourses, getCourseFromNumber } from "./idb";
+import { createIdb, registerCourses } from "./idb";
 
 export const parseXlsxFile = async (data: ArrayBuffer) => {
   const workbook = xlsx.read(data);
