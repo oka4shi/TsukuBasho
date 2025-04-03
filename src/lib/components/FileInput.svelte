@@ -41,17 +41,33 @@
     const files = filesDOM.files;
 
     if (files && files.length === 1) {
-      progress.text = "ファイルを変換しています……";
-      progress.value = 0.1;
-
+      progress = {
+        text: "ファイルを変換しています……",
+        value: 0.1,
+        isError: false
+      };
       const file = await files[0].arrayBuffer();
-      progress.value = 0.5;
 
-      progress.text = "Excelファイルからインポートしています……";
-      await parseXlsxFile(file);
+      progress = {
+        text: "Excelファイルからデータをインポートしています……",
+        value: 0.5,
+        isError: false
+      };
+      try {
+        await parseXlsxFile(file);
 
-      progress.text = "登録が完了しました！";
-      progress.value = 1;
+        progress = {
+          text: "登録が完了しました！",
+          value: 1,
+          isError: false
+        };
+      } catch {
+        progress = {
+          text: "登録中にエラーが発生しました！",
+          value: 1,
+          isError: true
+        };
+      }
     } else {
       progress.text = "ファイルがありません";
       progress.value = 1;
