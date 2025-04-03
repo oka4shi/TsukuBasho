@@ -14,3 +14,18 @@ export const searchNumberFromName = (
 
   return numbers;
 };
+
+export const completeNumber = (
+  courses: CoursesMap,
+  partialNumber: string
+): string[] => {
+  // 補完
+  const numbers: string[] = [];
+  for (const course of courses) {
+    if (course[0].startsWith(partialNumber)) {
+      numbers.push(course[0]);
+    }
+  }
+
+  return numbers;
+};

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getCourseFromNumber, getCoursesMap } from "$lib/idb";
-  import { searchNumberFromName } from "$lib/search";
+  import { getCoursesMap } from "$lib/idb";
+  import { completeNumber, searchNumberFromName } from "$lib/search";
   import { openDB, type IDBPDatabase } from "idb";
   import type { TsukuBashoDB } from "$lib/idb";
   import type { CoursesMap } from "$lib/types";
@@ -24,36 +24,21 @@
     coursesMap = await getCoursesMap(db);
   });
 
-  const search = async () => {
-    result = [];
-    number = { shown: 0, searched: 0 };
-    searchProcesses.forEach((p) => {
-      clearTimeout(p);
-    });
-    searchProcesses = [];
-
-    if (query === "") {
-      return;
+  const addResultToDOM = (courseNumber: string, i: number) => {
+    const c = coursesMap.get(courseNumber);
+    if (c === undefined) {
+      throw new Error("見つかりません");
     }
-
-    const course = await getCourseFromNumber(db, query);
-    if (course) {
+    const limit = 20;
+    if (i < limit) {
+      // 最初のlimit件までは即時に投入、それ以降は順番に追加していく（見える範囲のちらつきを防止しつつ操作が固まらないように）
       result.push({
-        number: course.number,
-        name: course.name,
-        classroom: course.classroom
+        number: courseNumber,
+        name: c.name,
+        classroom: c.classroom
       });
-      number = { shown: 1, searched: 1 };
-    }
-
-    const courseNumbers = searchNumberFromName(coursesMap, query);
-    number.searched = courseNumbers.length;
-
-    courseNumbers.forEach((courseNumber) => {
-      const c = coursesMap.get(courseNumber);
-      if (c === undefined) {
-        throw new Error("見つかりません");
-      }
+      number.shown += 1;
+    } else {
       const timeoutId = setTimeout(() => {
         result.push({
           number: courseNumber,
@@ -63,7 +48,35 @@
         number.shown += 1;
       });
       searchProcesses.push(timeoutId);
+    }
+  };
+  const search = async () => {
+    // 結果のDOM追加を中止
+    searchProcesses.forEach((p) => {
+      clearTimeout(p);
     });
+    searchProcesses = [];
+
+    // 空白の場合検索しない
+    if (query === "") {
+      result = [];
+      number = { shown: 0, searched: 0 };
+      return;
+    }
+
+    // 科目番号で検索
+    const courseNumbers = completeNumber(coursesMap, query);
+    // 科目名で検索
+    const courseNumbers1 = searchNumberFromName(coursesMap, query);
+
+    // 内容をいったんリセット
+    result = [];
+    number = {
+      shown: 0,
+      searched: courseNumbers.length + courseNumbers1.length
+    };
+    courseNumbers.forEach(addResultToDOM);
+    courseNumbers1.forEach(addResultToDOM);
   };
 </script>
 
