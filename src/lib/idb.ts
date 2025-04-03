@@ -65,14 +65,20 @@ export const registerCourses = async (
   const tx = db.transaction("list_of_courses", "readwrite");
   const rows: Promise<string>[] = [];
   data.forEach((row, i) => {
-    const record = getKeys(dataColumn).map((key) => {
-      return [key, String(row[dataColumn[key]])];
-    });
-
     if (firstRowNumber ? i <= firstRowNumber : i <= 0) {
       // firstRowNumber以下の行は無視（firstRowNumberが設定されていなければ1行目を無視）
       return;
     }
+
+    if (row[dataColumn.number].startsWith("0")) {
+      // 番号が0から始まる科目はスキップ
+      return;
+    }
+    console.log(row[dataColumn.number]);
+
+    const record = getKeys(dataColumn).map((key) => {
+      return [key, String(row[dataColumn[key]])];
+    });
 
     rows.push(tx.store.add(Object.fromEntries(record)));
   });
