@@ -48,7 +48,7 @@
       progress.value = 0.5;
 
       progress.text = "Excelファイルからインポートしています……";
-      parseXlsxFile(file);
+      await parseXlsxFile(file);
 
       progress.text = "登録が完了しました！";
       progress.value = 1;
