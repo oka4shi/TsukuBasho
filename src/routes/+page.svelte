@@ -93,38 +93,39 @@
         <span>の教室は</span>
         <span class="classroom">{result[0].classroom}</span>
         <span>です！</span>
+      {:else}
+        授業がみつかりません
       {/if}
     </p>
   </div>
-  <p>
-    他にも{number.searched}件の授業が見つかりました（{number.shown}件を表示中）
-  </p>
-  <table>
-    <thead>
-      <tr>
-        <th scope="col">科目番号</th>
-        <th scope="col">科目名</th>
-        <th scope="col">教室</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each result as course (course.number)}
-        {#if course}
-          <tr>
-            <td class="course-number"
+  <div class="courses">
+    <p>
+      他にも{number.searched}件の授業が見つかりました（{number.shown}件を表示中）
+    </p>
+    {#each result as course (course.number)}
+      {#if course}
+        <div class="card">
+          <p>
+            <span class="course-number"
               ><a
                 href="https://kdb.tsukuba.ac.jp/syllabi/2025/{course.number}/jpn"
                 target="_blank"
                 rel="noopener">{course.number}</a
-              ></td
+              ></span
             >
-            <td class="course-name">{course.name}</td>
-            <td class="classroom">{course.classroom}</td>
-          </tr>
-        {/if}
-      {/each}
-    </tbody>
-  </table>
+            <span class="course-name">{course.name}</span>
+          </p>
+          <p class="classroom">
+            {#if course.classroom}
+              <span>{course.classroom}</span>
+            {:else}
+              <span class="notfound">情報なし</span>
+            {/if}
+          </p>
+        </div>
+      {/if}
+    {/each}
+  </div>
 </main>
 
 <style>
@@ -144,6 +145,7 @@
   }
 
   .overview {
+    height: 5rem;
     .classroom {
       display: block;
       font-size: 1.5rem;
@@ -179,14 +181,33 @@
     }
   }
 
-  table {
-    width: 100%;
-    th {
-      text-align: left;
+  .courses {
+    margin-inline: 5rem;
+  }
+  .card {
+    border: 1px solid #ddd;
+    padding: 0.5em;
+    margin-block: 1em;
+    border-radius: 0.5em;
+    box-shadow: 0.25rem 0.25rem 0.5rem lightgray;
+
+    &:hover {
+      background-color: #f5f5f5;
     }
-    tbody {
-      .classroom {
-        font-size: 1.125rem;
+
+    p {
+      margin-block: 0.5em;
+    }
+
+    .classroom {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-inline-start: 1em;
+
+      .notfound {
+        color: var(--color-text-lightgray);
+        font-size: 1.5rem;
+        font-weight: normal;
       }
     }
   }

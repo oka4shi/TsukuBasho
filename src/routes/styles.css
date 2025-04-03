@@ -1,13 +1,12 @@
 :root {
   --font-body: "Noto Sans JP", sans-serif;
-  --color-bg-0: rgb(202, 216, 228);
-  --color-bg-1: hsl(209, 36%, 86%);
-  --color-bg-2: hsl(224, 44%, 95%);
+  --color-bg-1: hsl(185 100% 95%);
   --color-bg-white: #fdfdfd;
-  --color-theme-1: #ff3e00;
-  --color-theme-2: #4075a6;
-  --color-text: rgba(0, 0, 0, 0.7);
-  --color-text-gray: #333;
+  --color-theme-1: hsl(185 100% 41%);
+  --color-text: hsl(0 0% 5%);
+  --color-text-gray: hsl(0 0% 40%);
+  --color-text-lightgray: hsl(0 0% 60%);
+  --color-text-link: #3366cc;
   --column-width: 42rem;
   --column-margin-top: 4rem;
   font-family: var(--font-body);
@@ -17,17 +16,22 @@
 body {
   min-height: 100vh;
   margin: 0;
-  background-color: var(--color-bg-2);
+  background-color: var(--color-bg-1);
 }
 
 h1,
 h2,
 p {
   font-weight: 400;
+  margin-block: 0.25em;
 }
 
 p {
   line-height: 1.5;
+}
+
+a {
+  color: var(--color-text-link);
 }
 
 h1 {

@@ -76,10 +76,10 @@
     filesDOM.click();
   }}
 >
-  <div>
+  <p class="description">
     <span>ここにファイルをドロップ</span>
     <span>もしくはタップしてファイルを選択</span>
-  </div>
+  </p>
 </button>
 
 <input
@@ -90,18 +90,17 @@
   bind:this={filesDOM}
 />
 
-<button type="button" disabled={!isSetFiles} onclick={registerFiles}
-  >取り込む</button
->
-
 <Progress {...progress} />
 
-<style>
-  input {
-    display: none;
-  }
+<button
+  type="button"
+  class="register"
+  disabled={!isSetFiles}
+  onclick={registerFiles}>取り込む</button
+>
 
-  .drop_area {
+<style>
+  button {
     /* reset the default button styles */
     padding: 0;
     border: none;
@@ -112,18 +111,48 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+  }
 
+  .register {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: var(--color-theme-1);
+    color: white;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    margin: 1rem;
+  }
+
+  .register:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  .register:disabled {
+    background-color: var(--color-text-gray);
+    cursor: not-allowed;
+  }
+
+  input {
+    display: none;
+  }
+
+  .drop_area {
     height: 10em;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border-radius: 0.5em;
 
-    border: 1px dotted #808080;
+    border: 3px dotted #808080;
 
-    & span {
-      color: var(--color-text-gray);
-      text-align: center;
+    .description {
+      padding: 1em;
+
+      span {
+        color: var(--color-text-gray);
+        text-align: center;
+      }
     }
   }
 

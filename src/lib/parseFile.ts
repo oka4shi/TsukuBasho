@@ -3,9 +3,7 @@ import { createIdb, registerCourses } from "./idb";
 
 export const parseXlsxFile = async (data: ArrayBuffer) => {
   const workbook = xlsx.read(data);
-  console.log("start parsing");
   const sheetNames = workbook.SheetNames;
-  console.log(sheetNames);
 
   if (!sheetNames.includes("開設科目一覧")) {
     console.error("エラー！");
@@ -25,7 +23,6 @@ export const parseXlsxFile = async (data: ArrayBuffer) => {
 const getFirstRowNumber = (data: string[][]): number => {
   const limit = 10;
   for (let rowNumber = 0; rowNumber < limit; rowNumber++) {
-    console.log(data[rowNumber]);
     if (data[rowNumber][0] === "科目番号") {
       return rowNumber;
     }
