@@ -50,7 +50,8 @@ export const createIdb = async (dbName: string) => {
     }
   });
 
-  await db.put("meta", "2025-04-01T09:01:30Z", "created_at");
+  const date = new Date().toJSON();
+  await db.put("meta", date, "created_at");
 };
 
 export const deleteIdb = async (dbName: string) => {
@@ -64,7 +65,8 @@ export const registerCourses = async (
   firstRowNumber?: number
 ) => {
   const db = await openDB<TsukuBashoDB>(dbName);
-  await db.put("meta", "2025-04-01T9:16:00Z", "updated_at");
+  const date = new Date().toJSON();
+  await db.put("meta", date, "updated_at");
 
   const tx = db.transaction("list_of_courses", "readwrite");
   const rows: Promise<string>[] = [];
