@@ -12,10 +12,24 @@ export const parseXlsxFile = async (data: ArrayBuffer) => {
   }
 
   const sheet = workbook.Sheets[sheetNames[0]];
-  const rawData = xlsx.utils.sheet_to_json(sheet, { header: 1 });
-  console.log(rawData[0]);
+  const rawData = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
+  const firstRow = getFirstRowNumber(rawData);
+  if (firstRow === -1) {
+    throw new Error("ファイルを読み込めませんでした");
+  }
 
   await createIdb("TsukuBasho");
-  await registerCourses("TsukuBasho", rawData);
-  await getCourseFromNumber("TsukuBasho", "GE11212");
+  await registerCourses("TsukuBasho", rawData, firstRow);
+};
+
+const getFirstRowNumber = (data: string[][]): number => {
+  const limit = 10;
+  for (let rowNumber = 0; rowNumber < limit; rowNumber++) {
+    console.log(data[rowNumber]);
+    if (data[rowNumber][0] === "科目番号") {
+      return rowNumber;
+    }
+  }
+
+  return -1; // 見つからなければ -1 を返す
 };

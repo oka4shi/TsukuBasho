@@ -54,17 +54,27 @@ export const deleteIdb = async (dbName: string) => {
   console.log("完了しました");
 };
 
-export const registerCourses = async (dbName: string, data: string[][]) => {
+export const registerCourses = async (
+  dbName: string,
+  data: string[][],
+  firstRowNumber?: number
+) => {
   const db = await openDB<TsukuBashoDB>(dbName);
   await db.put("meta", "2025-04-01T9:16:00Z", "updated_at");
 
   const tx = db.transaction("list_of_courses", "readwrite");
-  const rows = data.map((row) => {
+  const rows: Promise<string>[] = [];
+  data.forEach((row, i) => {
     const record = getKeys(dataColumn).map((key) => {
       return [key, String(row[dataColumn[key]])];
     });
 
-    return tx.store.add(Object.fromEntries(record));
+    if (firstRowNumber ? i <= firstRowNumber : i <= 0) {
+      // firstRowNumber以下の行は無視（firstRowNumberが設定されていなければ1行目を無視）
+      return;
+    }
+
+    rows.push(tx.store.add(Object.fromEntries(record)));
   });
   const result = await Promise.all([...rows, tx.done]);
   console.log(result);
