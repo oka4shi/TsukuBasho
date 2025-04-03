@@ -35,7 +35,11 @@ export const createIdb = async (dbName: string) => {
     console.error("使えません！");
   }
 
-  const db = await openDB<TsukuBashoDB>(dbName, 1, {
+  const databases = await window.indexedDB.databases();
+  const targetDb = databases.filter((db) => db.name === dbName);
+  const version =
+    targetDb.length > 0 && targetDb[0].version ? targetDb[0].version + 1 : 1;
+  const db = await openDB<TsukuBashoDB>(dbName, version, {
     upgrade(db) {
       const syllabus = db.createObjectStore("list_of_courses", {
         keyPath: "number"
