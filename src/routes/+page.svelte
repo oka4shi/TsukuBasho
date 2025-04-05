@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { PUBLIC_IDB_NAME } from "$env/static/public";
   import { getCoursesMap } from "$lib/idb";
   import { completeNumber, searchNumberFromName } from "$lib/search";
   import { openDB, type IDBPDatabase } from "idb";
@@ -12,7 +13,7 @@
   );
   let number = $state({ shown: 0, searched: 0 });
 
-  const dbName = "TsukuBasho";
+  const dbName = PUBLIC_IDB_NAME || "TsukuBasho";
 
   let db: IDBPDatabase<TsukuBashoDB>;
   let coursesMap: CoursesMap;
