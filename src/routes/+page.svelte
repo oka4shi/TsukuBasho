@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PUBLIC_IDB_NAME } from "$env/static/public";
-  import { getCoursesMap } from "$lib/idb";
+  import { getCoursesMap, searchIdb } from "$lib/idb";
   import { completeNumber, searchNumberFromName } from "$lib/search";
   import { openDB, type IDBPDatabase } from "idb";
   import type { TsukuBashoDB } from "$lib/idb";
@@ -12,6 +12,7 @@
     []
   );
   let number = $state({ shown: 0, searched: 0 });
+  let dbExist = $state(true);
 
   const dbName = PUBLIC_IDB_NAME || "TsukuBasho";
 
@@ -21,8 +22,14 @@
   let searchProcesses: number[] = [];
 
   onMount(async () => {
-    db = await openDB<TsukuBashoDB>(dbName);
-    coursesMap = await getCoursesMap(db);
+    const database = await searchIdb(dbName);
+    if (database) {
+      dbExist = true;
+      db = await openDB<TsukuBashoDB>(dbName);
+      coursesMap = await getCoursesMap(db);
+    } else {
+      dbExist = false;
+    }
   });
 
   const addResultToDOM = (courseNumber: string, i: number) => {
@@ -90,30 +97,42 @@
 
 <main>
   <div class="top">
-    <form>
-      <label for="search">科目番号か科目名で検索</label>
-      <div class="search-box">
-        <input
-          type="search"
-          id="search"
-          bind:value={query}
-          oninput={search}
-        /><button type="button" aria-label="検索" title="検索" onclick={search}
-          ><img src="/search.svg" alt="" /></button
-        >
-      </div>
-    </form>
-    <p class="overview">
-      {#if result && result[0]}
-        <span>{result[0].number}</span>
-        <span>{result[0].name}</span>
-        <span>の教室は</span>
-        <span class="classroom">{result[0].classroom}</span>
-        <span>です！</span>
-      {:else}
-        授業がみつかりません
-      {/if}
-    </p>
+    {#if dbExist}
+      <form>
+        <label for="search">科目番号か科目名で検索</label>
+        <div class="search-box">
+          <input
+            type="search"
+            id="search"
+            bind:value={query}
+            oninput={search}
+          /><button
+            type="button"
+            aria-label="検索"
+            title="検索"
+            onclick={search}><img src="/search.svg" alt="" /></button
+          >
+        </div>
+      </form>
+      <p class="overview">
+        {#if result && result[0]}
+          <span>{result[0].number}</span>
+          <span>{result[0].name}</span>
+          <span>の教室は</span>
+          <span class="classroom">{result[0].classroom}</span>
+          <span>です！</span>
+        {:else}
+          授業がみつかりません
+        {/if}
+      </p>
+    {:else}
+      <p>登録したデータが見つかりません。</p>
+      <p>
+        はじめての場合やデータのリセットを行った場合は、まず<a href="/welcome"
+          >データの登録</a
+        >を行ってください
+      </p>
+    {/if}
   </div>
   <div class="courses">
     <p>

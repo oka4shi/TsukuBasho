@@ -30,9 +30,21 @@ const getKeys = <T extends { [key: string]: unknown }>(obj: T): (keyof T)[] => {
   return Object.keys(obj);
 };
 
+export const searchIdb = async (
+  dbName: string
+): Promise<IDBDatabaseInfo | null> => {
+  const databases = await window.indexedDB.databases();
+  const targetDb = databases.filter((db) => db.name === dbName);
+  if (targetDb && targetDb.length > 0) {
+    return targetDb[0];
+  } else {
+    return null;
+  }
+};
+
 export const createIdb = async (dbName: string) => {
   if (!navigator.storage || !navigator.storage.estimate) {
-    console.error("使えません！");
+    throw new Error("データがブラウザに保存できません");
   }
 
   const databases = await window.indexedDB.databases();
