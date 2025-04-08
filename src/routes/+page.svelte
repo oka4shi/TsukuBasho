@@ -117,17 +117,6 @@
           >
         </div>
       </form>
-      <p class="overview">
-        {#if result && result[0]}
-          <span>{result[0].number}</span>
-          <span>{result[0].name}</span>
-          <span>の教室は</span>
-          <span class="classroom">{result[0].classroom}</span>
-          <span>です！</span>
-        {:else}
-          授業がみつかりません
-        {/if}
-      </p>
     {:else if dbExist !== null}
       <p>登録したデータが見つかりません。</p>
       <p>
@@ -137,10 +126,12 @@
       </p>
     {/if}
   </div>
-  {#if dbExist}
-    <div class="courses">
+  <div class="courses">
+    {#if dbExist}
       <p>
-        他にも{number.searched}件の授業が見つかりました（{number.shown}件を表示中）
+        {number.searched === 0
+          ? "授業が見つかりませんでした"
+          : `${number.searched}件の授業が見つかりました（${number.shown}件を表示中）`}
       </p>
       {#each result as course (course.number)}
         {#if course}
@@ -165,8 +156,8 @@
           </div>
         {/if}
       {/each}
-    </div>
-  {/if}
+    {/if}
+  </div>
 </main>
 
 <style>
@@ -186,7 +177,6 @@
   }
 
   .overview {
-    height: 5rem;
     .classroom {
       display: block;
       font-size: 1.5rem;
