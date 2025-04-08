@@ -12,7 +12,7 @@
     []
   );
   let number = $state({ shown: 0, searched: 0 });
-  let dbExist = $state(true);
+  let dbExist = $state<boolean | null>(null);
 
   const dbName = PUBLIC_IDB_NAME || "TsukuBasho";
 
@@ -97,6 +97,9 @@
 
 <main>
   <div class="top">
+    {#if dbExist === null}
+      <p>データベースを読み込んでいます……</p>
+    {/if}
     {#if dbExist}
       <form>
         <label for="search">科目番号か科目名で検索</label>
@@ -125,7 +128,7 @@
           授業がみつかりません
         {/if}
       </p>
-    {:else}
+    {:else if dbExist !== null}
       <p>登録したデータが見つかりません。</p>
       <p>
         はじめての場合やデータのリセットを行った場合は、まず<a href="/welcome"
@@ -134,34 +137,36 @@
       </p>
     {/if}
   </div>
-  <div class="courses">
-    <p>
-      他にも{number.searched}件の授業が見つかりました（{number.shown}件を表示中）
-    </p>
-    {#each result as course (course.number)}
-      {#if course}
-        <div class="card">
-          <p>
-            <span class="course-number"
-              ><a
-                href="https://kdb.tsukuba.ac.jp/syllabi/2025/{course.number}/jpn"
-                target="_blank"
-                rel="noopener">{course.number}</a
-              ></span
-            >
-            <span class="course-name">{course.name}</span>
-          </p>
-          <p class="classroom">
-            {#if course.classroom}
-              <span>{course.classroom}</span>
-            {:else}
-              <span class="notfound">情報なし</span>
-            {/if}
-          </p>
-        </div>
-      {/if}
-    {/each}
-  </div>
+  {#if dbExist}
+    <div class="courses">
+      <p>
+        他にも{number.searched}件の授業が見つかりました（{number.shown}件を表示中）
+      </p>
+      {#each result as course (course.number)}
+        {#if course}
+          <div class="card">
+            <p>
+              <span class="course-number"
+                ><a
+                  href="https://kdb.tsukuba.ac.jp/syllabi/2025/{course.number}/jpn"
+                  target="_blank"
+                  rel="noopener">{course.number}</a
+                ></span
+              >
+              <span class="course-name">{course.name}</span>
+            </p>
+            <p class="classroom">
+              {#if course.classroom}
+                <span>{course.classroom}</span>
+              {:else}
+                <span class="notfound">情報なし</span>
+              {/if}
+            </p>
+          </div>
+        {/if}
+      {/each}
+    </div>
+  {/if}
 </main>
 
 <style>
