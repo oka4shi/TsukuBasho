@@ -42,16 +42,13 @@ export const searchIdb = async (
   }
 };
 
-export const createIdb = async (dbName: string) => {
+export const openIdb = async (dbName: string) => {
   if (!navigator.storage || !navigator.storage.estimate) {
     throw new Error("データがブラウザに保存できません");
   }
 
-  const databases = await window.indexedDB.databases();
-  const targetDb = databases.filter((db) => db.name === dbName);
-  const version =
-    targetDb.length > 0 && targetDb[0].version ? targetDb[0].version + 1 : 1;
-  const db = await openDB<TsukuBashoDB>(dbName, version, {
+  let isDbCreated = false;
+  const db = await openDB<TsukuBashoDB>(dbName, 1, {
     upgrade(db) {
       const syllabus = db.createObjectStore("list_of_courses", {
         keyPath: "number"
@@ -59,11 +56,16 @@ export const createIdb = async (dbName: string) => {
       syllabus.createIndex("name", "name", { unique: false });
 
       db.createObjectStore("meta");
+      isDbCreated = true;
     }
   });
 
-  const date = new Date().toJSON();
-  await db.put("meta", date, "created_at");
+  if (isDbCreated) {
+    const date = new Date().toJSON();
+    await db.put("meta", date, "created_at");
+  }
+
+  return db;
 };
 
 export const deleteIdb = async (dbName: string) => {
@@ -72,11 +74,10 @@ export const deleteIdb = async (dbName: string) => {
 };
 
 export const registerCourses = async (
-  dbName: string,
+  db: IDBPDatabase<TsukuBashoDB>,
   data: string[][],
   firstRowNumber?: number
 ) => {
-  const db = await openDB<TsukuBashoDB>(dbName);
   const date = new Date().toJSON();
   await db.put("meta", date, "updated_at");
 

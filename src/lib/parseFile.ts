@@ -1,5 +1,5 @@
 import * as xlsx from "xlsx";
-import { createIdb, registerCourses } from "./idb";
+import { openIdb, registerCourses } from "./idb";
 
 export const parseXlsxFile = async (data: ArrayBuffer) => {
   const workbook = xlsx.read(data);
@@ -16,8 +16,8 @@ export const parseXlsxFile = async (data: ArrayBuffer) => {
     throw new Error("ファイルを読み込めませんでした");
   }
 
-  await createIdb("TsukuBasho");
-  await registerCourses("TsukuBasho", rawData, firstRow);
+  const db = await openIdb("TsukuBasho");
+  await registerCourses(db, rawData, firstRow);
 };
 
 const getFirstRowNumber = (data: string[][]): number => {

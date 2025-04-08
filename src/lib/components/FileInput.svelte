@@ -61,7 +61,8 @@
           value: 1,
           isError: false
         };
-      } catch {
+      } catch (error) {
+        console.error(error);
         progress = {
           text: "登録中にエラーが発生しました！",
           value: 1,
