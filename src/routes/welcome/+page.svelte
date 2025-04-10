@@ -23,7 +23,7 @@
 
   <FileInput bind:file />
 
-  <Progress {...progress} />
+  <Progress {...$progress} />
 
   <button
     type="button"
