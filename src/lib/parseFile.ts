@@ -1,7 +1,7 @@
 import * as xlsx from "xlsx";
 import { openIdb, registerCourses } from "./idb";
 
-export const parseXlsxFile = async (data: ArrayBuffer) => {
+export const parseXlsxFile = (data: ArrayBuffer) => {
   const workbook = xlsx.read(data);
   const sheetNames = workbook.SheetNames;
 
@@ -11,13 +11,20 @@ export const parseXlsxFile = async (data: ArrayBuffer) => {
 
   const sheet = workbook.Sheets[sheetNames[0]];
   const rawData = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
+  return rawData;
+};
+
+export const registerCoursesFromRawData = async (
+  rawData: string[][],
+  excludingCourses?: string[]
+) => {
   const firstRow = getFirstRowNumber(rawData);
   if (firstRow === -1) {
     throw new Error("ファイルを読み込めませんでした");
   }
 
   const db = await openIdb("TsukuBasho");
-  await registerCourses(db, rawData, firstRow);
+  await registerCourses(db, rawData, firstRow, excludingCourses);
 };
 
 const getFirstRowNumber = (data: string[][]): number => {

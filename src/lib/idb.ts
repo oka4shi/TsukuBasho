@@ -76,7 +76,8 @@ export const deleteIdb = async (dbName: string) => {
 export const registerCourses = async (
   db: IDBPDatabase<TsukuBashoDB>,
   data: string[][],
-  firstRowNumber?: number
+  firstRowNumber?: number,
+  excludingCourses?: string[]
 ) => {
   const date = new Date().toJSON();
   await db.put("meta", date, "updated_at");
@@ -85,15 +86,19 @@ export const registerCourses = async (
   const rows: Promise<string>[] = [];
   data.forEach((row, i) => {
     if (firstRowNumber ? i <= firstRowNumber : i <= 0) {
-      // firstRowNumber以下の行は無視（firstRowNumberが設定されていなければ1行目を無視）
+      // firstRowNumber以前の行は無視（firstRowNumberが設定されていなければ1行目を無視）
       return;
     }
 
-    if (row[dataColumn.number].startsWith("0")) {
-      // 番号が0から始まる科目はスキップ
+    // 番号がexludingListの要素から始まる科目はスキップ
+    const shouldSkipCourse = excludingCourses?.some((prefix) => {
+      return row[dataColumn.number].startsWith(prefix);
+    });
+    if (shouldSkipCourse) {
       return;
     }
 
+    // 追加するデータを組み立て
     const record = getKeys(dataColumn).map((key) => {
       return [key, String(row[dataColumn[key]])];
     });

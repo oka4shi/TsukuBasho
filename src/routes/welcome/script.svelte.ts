@@ -1,4 +1,4 @@
-import { parseXlsxFile } from "$lib/parseFile";
+import { parseXlsxFile, registerCoursesFromRawData } from "$lib/parseFile";
 
 import { writable } from "svelte/store";
 
@@ -8,7 +8,10 @@ export const progress = writable({
   isError: false
 });
 
-export const registerFiles = async (file: File | null) => {
+export const registerFiles = async (
+  file: File | null,
+  excludingCourses: string[]
+) => {
   if (file === null) {
     progress.set({
       text: "ファイルがありません",
@@ -28,12 +31,18 @@ export const registerFiles = async (file: File | null) => {
   const arrayBufferedFile = await file.arrayBuffer();
 
   progress.set({
-    text: "Excelファイルからデータをインポートしています……",
+    text: "Excelファイルを解析しています……",
     value: 0.5,
     isError: false
   });
   try {
-    await parseXlsxFile(arrayBufferedFile);
+    const rawData = parseXlsxFile(arrayBufferedFile);
+    progress.set({
+      text: "データを保存しています……",
+      value: 0.75,
+      isError: false
+    });
+    await registerCoursesFromRawData(rawData, excludingCourses);
 
     progress.set({
       text: "登録が完了しました！",
