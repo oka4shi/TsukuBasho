@@ -176,14 +176,6 @@
     align-items: center;
   }
 
-  .overview {
-    .classroom {
-      display: block;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-  }
-
   .search-box {
     position: relative;
     height: 2.75rem;
