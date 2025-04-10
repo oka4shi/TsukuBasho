@@ -32,31 +32,43 @@
     }
   });
 
-  const addResultToDOM = (courseNumber: string, i: number) => {
-    const c = coursesMap.get(courseNumber);
-    if (c === undefined) {
-      throw new Error("見つかりません");
-    }
-    const limit = 20;
-    if (i < limit) {
-      // 最初のlimit件までは即時に投入、それ以降は順番に追加していく（見える範囲のちらつきを防止しつつ操作が固まらないように）
-      result.push({
-        number: courseNumber,
-        name: c.name,
-        classroom: c.classroom
-      });
-      number.shown += 1;
-    } else {
-      const timeoutId = setTimeout(() => {
+  const addResultToDOM = (coursesNumbers: string[]) => {
+    const chunk = 10;
+
+    const chunks: (typeof result)[] = [
+      ...Array(Math.ceil(coursesNumbers.length / chunk))
+    ].map(() => []);
+
+    coursesNumbers.forEach((courseNumber, i) => {
+      const c = coursesMap.get(courseNumber);
+      if (c === undefined) {
+        throw new Error("見つかりません");
+      }
+
+      // 最初のchunk件までは即時に投入、それ以降はchunk件ずつ順番に追加していく（見える範囲のちらつきを防止しつつ操作が固まらないように）
+      if (i < chunk) {
         result.push({
           number: courseNumber,
           name: c.name,
           classroom: c.classroom
         });
         number.shown += 1;
+      } else {
+        chunks[Math.floor(i / chunk)].push({
+          number: courseNumber,
+          name: c.name,
+          classroom: c.classroom
+        });
+      }
+    });
+
+    chunks.forEach((c) => {
+      const timeoutId = setTimeout(() => {
+        result.push(...c);
+        number.shown += c.length;
       });
       searchProcesses.push(timeoutId);
-    }
+    });
   };
   const search = async () => {
     // 結果のDOM追加を中止
@@ -87,7 +99,7 @@
       shown: 0,
       searched: combinedResult.length
     };
-    combinedResult.forEach(addResultToDOM);
+    addResultToDOM(combinedResult);
   };
 </script>
 
