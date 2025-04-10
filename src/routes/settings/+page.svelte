@@ -1,5 +1,6 @@
 <script lang="ts">
   import { deleteIdb } from "$lib/idb";
+  import { PUBLIC_IDB_NAME } from "$env/static/public";
 </script>
 
 <h1>設定</h1>
@@ -10,6 +11,6 @@
 <button
   type="button"
   onclick={() => {
-    deleteIdb("TsukuBasho");
+    deleteIdb(PUBLIC_IDB_NAME || "TsukuBasho");
   }}>リセット</button
 >

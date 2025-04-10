@@ -1,5 +1,6 @@
 import * as xlsx from "xlsx";
 import { openIdb, registerCourses } from "./idb";
+import { PUBLIC_IDB_NAME } from "$env/static/public";
 
 export const parseXlsxFile = (data: ArrayBuffer) => {
   const workbook = xlsx.read(data);
@@ -23,7 +24,8 @@ export const registerCoursesFromRawData = async (
     throw new Error("ファイルを読み込めませんでした");
   }
 
-  const db = await openIdb("TsukuBasho");
+  const dbName = PUBLIC_IDB_NAME || "TsukuBasho";
+  const db = await openIdb(dbName);
   await registerCourses(db, rawData, firstRow, excludingCourses);
 };
 
