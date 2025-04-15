@@ -8,8 +8,8 @@
   import { onMount } from "svelte";
 
   let query = $state("");
-  let result: { number: string; name: string; classroom: string }[] = $state(
-    []
+  let results: { number: string; name: string; classroom: string }[][] = $state(
+    [[]]
   );
   let number = $state({ shown: 0, searched: 0 });
   let dbExist = $state<boolean | null>(null);
@@ -35,7 +35,7 @@
   const addResultToDOM = (coursesNumbers: string[]) => {
     const chunk = 10;
 
-    const chunks: (typeof result)[] = [
+    const chunks: typeof results = [
       ...Array(Math.ceil(coursesNumbers.length / chunk))
     ].map(() => []);
 
@@ -47,7 +47,7 @@
 
       // 最初のchunk件までは即時に投入、それ以降はchunk件ずつ順番に追加していく（見える範囲のちらつきを防止しつつ操作が固まらないように）
       if (i < chunk) {
-        result.push({
+        results[0].push({
           number: courseNumber,
           name: c.name,
           classroom: c.classroom
@@ -64,7 +64,7 @@
 
     chunks.forEach((c) => {
       const timeoutId = setTimeout(() => {
-        result.push(...c);
+        results[0].push(...c);
         number.shown += c.length;
       });
       searchProcesses.push(timeoutId);
@@ -79,9 +79,9 @@
 
     // 空白の場合検索しない
     if (query === "") {
-      result = [];
+      results = [[]];
       number = { shown: 0, searched: 0 };
-      return;
+      //return;
     }
 
     // 科目番号で検索
@@ -94,7 +94,7 @@
     );
 
     // 内容をいったんリセット
-    result = [];
+    results = [[]];
     number = {
       shown: 0,
       searched: combinedResult.length
@@ -145,28 +145,32 @@
           ? "授業が見つかりませんでした"
           : `${number.searched}件の授業が見つかりました（${number.shown}件を表示中）`}
       </p>
-      {#each result as course (course.number)}
-        {#if course}
-          <div class="card">
-            <p>
-              <span class="course-number"
-                ><a
-                  href="https://kdb.tsukuba.ac.jp/syllabi/2025/{course.number}/jpn"
-                  target="_blank"
-                  rel="noopener">{course.number}</a
-                ></span
-              >
-              <span class="course-name">{course.name}</span>
-            </p>
-            <p class="classroom">
-              {#if course.classroom}
-                <span>{course.classroom}</span>
-              {:else}
-                <span class="notfound">情報なし</span>
-              {/if}
-            </p>
-          </div>
-        {/if}
+      {#each results as result (result)}
+        <div class="courses">
+          {#each result as course (course.number)}
+            {#if course}
+              <div class="card">
+                <p>
+                  <span class="course-number"
+                    ><a
+                      href="https://kdb.tsukuba.ac.jp/syllabi/2025/{course.number}/jpn"
+                      target="_blank"
+                      rel="noopener">{course.number}</a
+                    ></span
+                  >
+                  <span class="course-name">{course.name}</span>
+                </p>
+                <p class="classroom">
+                  {#if course.classroom}
+                    <span>{course.classroom}</span>
+                  {:else}
+                    <span class="notfound">情報なし</span>
+                  {/if}
+                </p>
+              </div>
+            {/if}
+          {/each}
+        </div>
       {/each}
     {/if}
   </div>
