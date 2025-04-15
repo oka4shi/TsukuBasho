@@ -18,12 +18,14 @@ export interface TsukuBashoDB extends DBSchema {
 const dataColumn = {
   number: 0,
   name: 1,
+  instructional_type: 2,
   credits: 3,
   standard_registration_year: 4,
   term: 5,
   meeting_days_period_etc: 6,
   classroom: 7,
-  instructor: 8
+  instructor: 8,
+  remarks: 10
 } as const satisfies { [column in keyof Course]: number };
 
 const getKeys = <T extends { [key: string]: unknown }>(obj: T): (keyof T)[] => {
