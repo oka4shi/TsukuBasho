@@ -105,8 +105,6 @@
 
 <h1>TsukuBasho（ベータ版）</h1>
 
-<p>はじめての場合は、まず<a href="/welcome">データの登録</a>を行ってください</p>
-
 <main>
   <div class="top">
     {#if dbExist === null}
